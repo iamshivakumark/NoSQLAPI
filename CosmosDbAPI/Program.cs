@@ -1,6 +1,11 @@
 using CosmosDbAPI.Contracts;
 using CosmosDbAPI.Service;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 using System.Configuration;
 using System.Security.Principal;
 
@@ -33,6 +38,28 @@ namespace CosmosDbAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+  .AddMicrosoftIdentityWebApp(builder.Configuration);
+
+            builder.Services.AddControllersWithViews(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            });
+
+
+            builder.Services.AddRazorPages()
+                .AddMvcOptions(options =>
+                {
+                    var policy = new AuthorizationPolicyBuilder()
+                                     .RequireAuthenticatedUser()
+                                     .Build();
+                    options.Filters.Add(new AuthorizeFilter(policy));
+                })
+                .AddMicrosoftIdentityUI();
+
             var app = builder.Build();
             app.UseSwagger();
             app.UseSwaggerUI();
@@ -46,6 +73,7 @@ namespace CosmosDbAPI
             }
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
