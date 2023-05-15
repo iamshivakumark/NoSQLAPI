@@ -21,7 +21,7 @@
     },
     "resourceName": {
       "type": "string",
-      "defaultValue": "CosmosDbAPI20230515180108",
+      "defaultValue": "cosmosdbnosql",
       "metadata": {
         "description": "Name of the main resource to be created by this template."
       }
